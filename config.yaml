@@ -6,7 +6,7 @@ deployment:
   targets:
     name: "hi.thiagonbcarvalho.com"
     URL: "s3://hi.thiagonbcarvalho.com?region=us-east-1"
-    cloudFrontDistributionID: "E5XTMXYUWYZ2J"
+    cloudFrontDistributionID: "E3OBQCBCZZUJR1"
     matchers:
       - pattern: "^.+\\.(js|css|svg|ttf)$"
         cacheControl: "max-age=86400, no-transform, public"
