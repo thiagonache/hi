@@ -1,6 +1,6 @@
 ---
 title: "Go: Tracing requisições HTTP"
-date: 2022-06-03T07:07:15-03:00
+date: 2022-06-06T07:07:15-03:00
 draft: false
 ---
 
