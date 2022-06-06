@@ -1,0 +1,40 @@
+baseURL: "https://hi.thiagonbcarvalho.com"
+defaultContentLanguage: pt
+theme: "ananke"
+enableRobotsTXT: true
+deployment:
+  targets:
+    name: "hi.thiagonbcarvalho.com"
+    URL: "s3://hi.thiagonbcarvalho.com?region=us-east-1"
+    cloudFrontDistributionID: "E5XTMXYUWYZ2J"
+    matchers:
+      - pattern: "^.+\\.(js|css|svg|ttf)$"
+        cacheControl: "max-age=86400, no-transform, public"
+        gzip: true
+      - pattern: "^.+\\.(png|jpg)$"
+        cacheControl: "max-age=86400, no-transform, public"
+        gzip: false
+      - pattern: "^sitemap\\.xml$"
+        contentType: "application/xml"
+        gzip: true
+      - pattern: "^.+\\.(html|xml|json)$"
+        gzip: true
+languages:
+  pt:
+    languageName: Portuguese
+    weight: 1
+    contentDir: content/pt
+    title: Blog do Nache
+  en:
+    languageName: English
+    weight: 2
+    contentDir: content/en
+    title: Thiago Carvalho's blog
+params:
+  ananke_socials:
+    - name: "twitter"
+      url: "https://twitter.com/thiagonache"
+    - name: "linkedin"
+      url: "https://linkedin.com/in/thiagonache"
+    - name: "github"
+      url: "https://github.com/thiagonache"
