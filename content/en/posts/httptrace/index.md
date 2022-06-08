@@ -4,7 +4,7 @@ date: 2022-06-06T07:07:15-03:00
 draft: false
 ---
 
-The HTTP protocol is fast, secure and reliable. However, it needs other protocols and services to work properly and **when things don't go well it is necessary to have access to detailed information about the time spent in each step**.
+The HTTP protocol is fast, secure, and reliable. However, it needs other protocols and services to work properly, and **when things don’t go well it is necessary to have access to detailed information about the time spent in each step**.
 
 The steps to make an HTTP call are as follows:
 
@@ -27,29 +27,35 @@ The steps to make an HTTP call are as follows:
 
 This is just one of the possible cases for an HTTP request, as we are not addressing persistent connections, connection pooling, or other protocol features.
 
-Go has the **net/http/httptrace** package so that we can collect detailed information about an HTTP request and will be the subject of this article.
+Go has the **net/http/httptrace** package so that we can collect detailed information about an HTTP request which will be the subject of this article.
 
-After all that said, **how long does it take to translate the name to IP**. Download the [simple-main.go](simple-main.go) file.
+That said, **how long does it take to translate the name to IP**. Download the [simple-main.go](simple-main.go) file.
 
 ```go
 func main() {
 	var start, dns time.Time
 	var took, dnsTook time.Duration
 
-	clientTrace := &httptrace.ClientTrace{
-		DNSStart: func(info httptrace.DNSStartInfo) { dns = time.Now() },
-		DNSDone:  func(info httptrace.DNSDoneInfo) { dnsTook = time.Since(dns) },
+	ct := &httptrace.ClientTrace{
+		DNSStart: func(info httptrace.DNSStartInfo) { 
+         dns = time.Now() 
+      },
+		DNSDone:  func(info httptrace.DNSDoneInfo) { 
+         dnsTook = time.Since(dns) 
+      },
 	}
 	req, _ := http.NewRequest(http.MethodGet, "https://httpbin.org/", nil)
-	clientTraceCtx := httptrace.WithClientTrace(req.Context(), clientTrace)
-	req = req.WithContext(clientTraceCtx)
+	ctCtx := httptrace.WithClientTrace(req.Context(), ct)
+	req = req.WithContext(ctCtx)
 	start = time.Now()
 	_, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	took = time.Since(start)
-	fmt.Printf("total %dms, dns %dms\n", took.Milliseconds(), dnsTook.Milliseconds())
+	fmt.Printf("total %dms, dns %dms\n",
+      took.Milliseconds(), dnsTook.Milliseconds()
+   )
 }
 ```
 
@@ -78,11 +84,11 @@ type Client struct {
 }
 ```
 
-For this article we will only contain the _Transport_ field of the _struct_ which is a [_http.RoundTriper_](https://pkg.go.dev/net/http#RoundTripper) which is nothing more than an interface to a function that receives a pointer to [_http.Request_](https://pkg.go.dev/net/http#Request) and returns a pointer to [_http.Response_](https://pkg.go.dev/net/http#Response) it is a mistake. This is quite convenient since basically everything in an HTTP client call involves a request, a response and if there was an error in the process.
+For this article, we will only contain the _Transport_ field of the _struct_ which is a [_http.RoundTripper_](https://pkg.go.dev/net/http#RoundTripper) which is nothing more than an interface to a function that receives a pointer to [_http.Request_](https://pkg.go.dev/net/http#Request) and returns a pointer to [_http.Response_](https://pkg.go.dev/net/http#Response) and an error. This is quite convenient since basically everything in an HTTP client call involves a request, a response and if there was an error in the process.
 
 ## RoundTripper
 
-According to the Go documentation a _RoundTrip_ is `"the ability to execute a single HTTP transaction, obtaining the Response for a given Request."`. In a simplistic way we can say that _RoundTrip_ is nothing more than a _middleware_ of your HTTP call. You generally don't need to worry about this until you have to add a default behavior to **all** calls made by your application, such as serving a _cache_ page of connections (not responses) instead. to fetch the server or implement _retries_.
+According to the Go documentation, a _RoundTrip_ is `"the ability to execute a single HTTP transaction, obtaining the Response for a given Request."`. In a simplistic way, we can say that _RoundTrip_ is nothing more than a _middleware_ for your HTTP call. You generally don't need to worry about this until you have to add a default behavior to **all** calls made by your application, such as serving a _cache_ page of connections (not responses) instead. to fetch the server or implement _retries_.
 
 The _DefaultRoundTrip_ is the following variable:
 
@@ -211,7 +217,7 @@ Let's now create the code to _trace_ an HTTP call and give us detailed informati
    ```go
    resp, err := http.DefaultClient.Do(req)
    if err != nil {
-       log.fatal(err)
+       log.Fatal(err)
    }
    ```
 
@@ -220,12 +226,12 @@ Let's now create the code to _trace_ an HTTP call and give us detailed informati
    ```go
    _, err = io.Copy(io.Discard, resp.Body)
    if err != nil {
-       log.fatal(err)
+       log.Fatal(err)
    }
    resp.Body.Close()
    ```
 
-Access the complete code at [link](https://go.dev/play/p/ITwAQLcjZSg), read it carefully and run it from your computer. You should see something similar to the content below.
+Access the complete code at [link](complete-main.go), read it carefully and run it from your computer. You should see something similar to the content below.
 
 ```text
 2022/06/03 17:18:15 [TRACE] - starting to create conn to "releases.ubuntu.com:443"

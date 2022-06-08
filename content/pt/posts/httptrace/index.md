@@ -36,20 +36,26 @@ func main() {
 	var start, dns time.Time
 	var took, dnsTook time.Duration
 
-	clientTrace := &httptrace.ClientTrace{
-		DNSStart: func(info httptrace.DNSStartInfo) { dns = time.Now() },
-		DNSDone:  func(info httptrace.DNSDoneInfo) { dnsTook = time.Since(dns) },
+	ct := &httptrace.ClientTrace{
+		DNSStart: func(info httptrace.DNSStartInfo) {
+         dns = time.Now()
+      },
+		DNSDone:  func(info httptrace.DNSDoneInfo) {
+         dnsTook = time.Since(dns)
+      },
 	}
 	req, _ := http.NewRequest(http.MethodGet, "https://httpbin.org/", nil)
-	clientTraceCtx := httptrace.WithClientTrace(req.Context(), clientTrace)
-	req = req.WithContext(clientTraceCtx)
+	ctCtx := httptrace.WithClientTrace(req.Context(), ct)
+	req = req.WithContext(ctCtx)
 	start = time.Now()
 	_, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	took = time.Since(start)
-	fmt.Printf("total %dms, dns %dms\n", took.Milliseconds(), dnsTook.Milliseconds())
+	fmt.Printf("total %dms, dns %dms\n",
+      took.Milliseconds(), dnsTook.Milliseconds()
+   )
 }
 ```
 
@@ -78,7 +84,7 @@ type Client struct {
 }
 ```
 
-Para este artigo iremos nos ater apenas no campo _Transport_ da _struct_, que é um [_http.RoundTriper_](https://pkg.go.dev/net/http#RoundTripper), que nada mais é que uma interface para uma função que recebe um ponteiro para [_http.Request_](https://pkg.go.dev/net/http#Request) e retorna um ponteiro para [_http.Response_](https://pkg.go.dev/net/http#Response) e um erro. Isto é bastante conveniente já que basicamente tudo em uma chamada cliente HTTP envolve uma requisição, uma resposta e se houve algum erro no processo.
+Para este artigo iremos nos ater apenas no campo _Transport_ da _struct_, que é um [_http.RoundTripper_](https://pkg.go.dev/net/http#RoundTripper), que nada mais é que uma interface para uma função que recebe um ponteiro para [_http.Request_](https://pkg.go.dev/net/http#Request) e retorna um ponteiro para [_http.Response_](https://pkg.go.dev/net/http#Response) e um erro. Isto é bastante conveniente já que basicamente tudo em uma chamada cliente HTTP envolve uma requisição, uma resposta e se houve algum erro no processo.
 
 ## RoundTripper
 
