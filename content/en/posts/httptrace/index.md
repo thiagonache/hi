@@ -88,7 +88,7 @@ For this article, we will only contain the _Transport_ field of the _struct_ whi
 
 ## RoundTripper
 
-According to the Go documentation, a _RoundTrip_ is `"the ability to execute a single HTTP transaction, obtaining the Response for a given Request."`. In a simplistic way, we can say that _RoundTrip_ is nothing more than a _middleware_ for your HTTP call. You generally don't need to worry about this until you have to add a default behavior to **all** calls made by your application, such as serving a _cache_ page of connections (not responses) instead. to fetch the server or implement _retries_.
+According to the Go documentation, a _RoundTrip_ is `"the ability to execute a single HTTP transaction, obtaining the Response for a given Request."`. In a simplistic way, we can say that _RoundTrip_ is nothing more than a _middleware_ for your HTTP call. You generally don't need to worry about this until you have to add a default behavior to **all** calls made by your application, such as serving a page from _cache_ instead of fetching from the server or implement _retries_.
 
 The _DefaultRoundTrip_ is the following variable:
 
